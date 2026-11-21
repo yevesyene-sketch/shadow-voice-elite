@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>SHADOW VOICE</title>
+<style>
+:root{--bg:#050505;--panel:#0e0d0b;--line:#2a2418;--gold:#d4af37;--gold2:#f3d77a;--gold3:#8a6d1c;--txt:#efe7d2;--mut:#8f866f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{min-height:100vh;padding:env(safe-area-inset-top) 14px calc(env(safe-area-inset-bottom) + 24px);background:radial-gradient(ellipse at 50% -10%,#1c1606 0%,#050505 55%)}
+.wrap{max-width:560px;margin:0 auto}
+header{text-align:center;padding:22px 0 12px}
+.logo{width:64px;height:64px;margin:0 auto 8px;display:block}
+h1{margin:0;font-size:26px;letter-spacing:.32em;font-weight:700;background:linear-gradient(180deg,var(--gold2),var(--gold) 55%,var(--gold3));-webkit-background-clip:text;background-clip:text;color:transparent;padding-left:.32em}
+.tag{color:var(--mut);font-size:11px;letter-spacing:.3em;margin-top:4px;text-transform:uppercase}
+.card{background:linear-gradient(180deg,#121109,var(--panel));border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px;box-shadow:0 0 0 1px #000 inset,0 8px 30px #000a}
+label.t{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+label.t span{color:var(--mut);letter-spacing:0;text-transform:none}
+textarea{width:100%;min-height:150px;resize:vertical;background:#070707;color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px;line-height:1.5;font-family:inherit;outline:none}
+textarea:focus,select:focus{border-color:var(--gold)}
+.row{display:flex;gap:8px;margin-top:10px}
+button{font:inherit;cursor:pointer;border-radius:12px;border:1px solid var(--gold3);background:#12100a;color:var(--gold2);padding:13px 6px;font-size:14px;font-weight:600;flex:1;min-height:48px;transition:.15s}
+button:active{transform:scale(.97)}
+button.main{background:linear-gradient(180deg,var(--gold2),var(--gold) 60%,var(--gold3));color:#1a1405;border-color:var(--gold2);box-shadow:0 0 18px #d4af3740}
+button:disabled{opacity:.35;cursor:not-allowed}
+.ghost{background:transparent;color:var(--mut);border-color:var(--line);font-weight:500;font-size:12px;padding:8px;min-height:36px;flex:0 0 auto}
+.ctrl{margin-top:14px}
+.ctrl .h{display:flex;justify-content:space-between;font-size:13px;color:var(--txt);margin-bottom:6px}
+.ctrl .h b{color:var(--gold2);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--gold);height:28px;background:transparent}
+select{width:100%;background:#070707;color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:15px;outline:none}
+.hint{font-size:12px;color:var(--mut);line-height:1.45;margin-top:8px}
+.wave{display:flex;align-items:center;justify-content:center;gap:4px;height:34px;margin-top:12px}
+.wave i{display:block;width:4px;height:6px;border-radius:3px;background:linear-gradient(var(--gold2),var(--gold3));opacity:.5}
+.playing .wave i{animation:b 0.9s ease-in-out infinite;opacity:1}
+@keyframes b{0%,100%{height:6px}50%{height:30px}}
+.status{text-align:center;font-size:13px;color:var(--mut);margin-top:6px;min-height:18px}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border:1px solid var(--gold3);border-radius:20px;color:var(--gold);margin-left:6px;letter-spacing:.08em}
+.warn{border:1px solid #5a4410;background:#150f04;color:#d9c48a;border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.5;margin-top:14px}
+.alert{display:none;border:1px solid #7a2a1a;background:#1a0a06;color:#f0b9a8;border-radius:12px;padding:12px;font-size:13px;line-height:1.55;margin-top:14px}
+.alert b{color:#ffd9cc}
+.diag{font-size:11.5px;color:var(--mut);line-height:1.6;font-variant-numeric:tabular-nums;word-break:break-word}
+.diag b{color:var(--gold2);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+<header>
+  <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d77a"/><stop offset=".6" stop-color="#d4af37"/><stop offset="1" stop-color="#8a6d1c"/></linearGradient></defs>
+    <circle cx="32" cy="32" r="29" fill="#0a0a0a" stroke="url(#g)" stroke-width="2.5"/>
+    <g fill="url(#g)"><rect x="14" y="26" width="4" height="12" rx="2"/><rect x="21" y="20" width="4" height="24" rx="2"/><rect x="28" y="13" width="4" height="38" rx="2"/><rect x="35" y="19" width="4" height="26" rx="2"/><rect x="42" y="24" width="4" height="16" rx="2"/><rect x="49" y="28" width="3" height="8" rx="1.5"/></g>
+  </svg>
+  <h1>SHADOW VOICE</h1>
+  <div class="tag">Studio vocal · Voix off française</div>
+</header>
+
+<div class="alert" id="alert"></div>
+
+<div class="card">
+  <label class="t">Texte français <span id="count">0 caractère</span></label>
+  <textarea id="text" placeholder="Colle ici ton texte en français…"></textarea>
+  <div class="row"><button class="ghost" id="paste">Coller</button><button class="ghost" id="clear">Effacer</button></div>
+</div>
+
+<div class="card" id="player">
+  <div class="row" style="margin-top:0">
+    <button class="main" id="play">▶ Écouter</button>
+  </div>
+  <div class="row">
+    <button id="pause" disabled>⏸ Pause</button>
+    <button id="resume" disabled>⏯ Reprendre</button>
+    <button id="stop" disabled>⏹ Stop</button>
+  </div>
+  <div class="wave" aria-hidden="true"><i></i><i style="animation-delay:.1s"></i><i style="animation-delay:.2s"></i><i style="animation-delay:.3s"></i><i style="animation-delay:.15s"></i><i style="animation-delay:.25s"></i><i style="animation-delay:.05s"></i><i style="animation-delay:.35s"></i><i style="animation-delay:.12s"></i></div>
+  <div class="status" id="status">Prêt.</div>
+</div>
+
+<div class="card">
+  <label class="t">Réglages</label>
+  <div class="ctrl" style="margin-top:0"><div class="h"><span>Vitesse</span><b id="rv">0.90×</b></div><input type="range" id="rate" min="0.5" max="1.5" step="0.05" value="0.9"></div>
+  <div class="ctrl"><div class="h"><span>Ton (grave ← → aigu)</span><b id="pv">0.60</b></div><input type="range" id="pitch" min="0.1" max="1.5" step="0.05" value="0.6"></div>
+  <div class="ctrl"><div class="h"><span>Voix <span class="badge" id="vcount">0 voix FR</span></span></div><select id="voice"></select>
+    <div class="hint">Les réglages s'appliquent à la phrase suivante pendant la lecture.</div></div>
+  <div class="row"><button id="test" class="ghost" style="flex:1">🔊 Test rapide du son</button></div>
+</div>
+
+<div class="card">
+  <button id="mp3" disabled style="width:100%">⬇ Télécharger MP3</button>
+  <div class="hint">Indisponible avec la voix de l'appareil (aucun enregistrement possible). Prévu à l'étape suivante avec un moteur open source.</div>
+</div>
+
+
+<div class="card" id="recorder">
+  <label class="t">Voice Recorder <span id="recStatus">Prêt à enregistrer</span></label>
+  <div class="row">
+    <button class="main" id="recStart">● Enregistrer</button>
+    <button id="recStop" disabled>■ Arrêter</button>
+  </div>
+  <audio id="recPlayback" controls style="display:none;width:100%;margin-top:12px"></audio>
+  <div class="row">
+    <button id="recDownload" disabled>⬇ Télécharger l’enregistrement</button>
+  </div>
+  <div class="hint">Enregistrement depuis le microphone de votre téléphone. Autorisez l’accès au microphone lorsque Chrome le demande.</div>
+</div>
+
+<div class="card">
+  <label class="t">Diagnostic</label>
+  <div class="diag" id="diag">…</div>
+</div>
+
+<div class="warn"><b>Version de test.</b> Voix = synthèse intégrée à Android/Chrome : gratuite, sans quota. La qualité dépend des voix installées sur ton téléphone.</div>
+</div>
+
+<script>
+/* ============ SHADOW VOICE — moteur « Voix de l'appareil » (Web Speech API) ============ */
+const $ = id => document.getElementById(id);
+const el = {text:$('text'),play:$('play'),pause:$('pause'),resume:$('resume'),stop:$('stop'),rate:$('rate'),pitch:$('pitch'),voice:$('voice'),status:$('status'),app:$('app'),alert:$('alert'),diag:$('diag'),test:$('test')};
+const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+
+let frVoices = [];
+let chunks = [], idx = 0;
+let state = 'idle';        // idle | playing | paused
+let session = 0;           // invalide les anciens callbacks après stop/pause
+let started = false;       // un son a-t-il réellement démarré ?
+let lastEvent = 'aucun', lastError = '—';
+let keepRef = null;        // garde une référence (évite le bug de ramasse-miettes de Chrome)
+
+/* ---------- Affichage ---------- */
+function setStatus(msg){ el.status.textContent = msg; }
+function showAlert(html){ el.alert.innerHTML = html; el.alert.style.display = html ? 'block' : 'none'; }
+function renderDiag(){
+  el.diag.innerHTML =
+    'Synthèse vocale : <b>' + (synth ? 'disponible' : 'ABSENTE') + '</b><br>' +
+    'Voix françaises : <b>' + frVoices.length + '</b><br>' +
+    'Dernier événement : <b>' + lastEvent + '</b><br>' +
+    'Dernière erreur : <b>' + lastError + '</b><br>' +
+    'Navigateur : <b>' + (/Chrome\/(\d+)/.exec(navigator.userAgent)||[0,'?'])[1] + (/Android/.test(navigator.userAgent)?' · Android':'') + '</b>';
+}
+function setState(s){
+  state = s;
+  el.play.disabled   = (s !== 'idle');
+  el.pause.disabled  = (s !== 'playing');
+  el.resume.disabled = (s !== 'paused');
+  el.stop.disabled   = (s === 'idle');
+  el.app.classList.toggle('playing', s === 'playing');
+}
+
+/* ---------- Voix ---------- */
+const MALE_HINT = /thomas|paul|henri|antoine|nicolas|mathieu|male|homme|\bfrd\b|-frd-|_frd_/i;
+const FEMALE_HINT = /amelie|amélie|marie|julie|denise|female|femme|\bfra-x-vlf|-frb-|-frc-/i;
+function voiceScore(v){
+  const n = (v.name + ' ' + v.voiceURI);
+  let s = 0;
+  if (MALE_HINT.test(n)) s += 5;
+  if (FEMALE_HINT.test(n) && !/\bmale\b/i.test(n)) s -= 5;
+  if (/^fr[-_]FR/i.test(v.lang)) s += 2;
+  if (!v.localService) s -= 1;          // préfère les voix locales (hors ligne)
+  return s;
+}
+function loadVoices(){
+  if (!synth) { renderDiag(); return; }
+  const all = synth.getVoices() || [];
+  frVoices = all.filter(v => /^fr/i.test(v.lang)).sort((a,b) => voiceScore(b) - voiceScore(a));
+  const keep = el.voice.value;
+  el.voice.innerHTML = '';
+  frVoices.forEach((v,i) => {
+    const likelyMale = MALE_HINT.test(v.name + ' ' + v.voiceURI) && !FEMALE_HINT.test(v.name);
+    el.voice.add(new Option((likelyMale ? '♂ ' : '') + v.name + ' · ' + v.lang, String(i)));
+  });
+  if (!frVoices.length) el.voice.add(new Option('Aucune voix française détectée', '-1'));
+  else if (keep && keep !== '-1' && +keep < frVoices.length) el.voice.value = keep;
+  $('vcount').textContent = frVoices.length + ' voix FR';
+  if (!frVoices.length && all.length) {
+    showAlert('<b>Aucune voix française disponible.</b><br>Le téléphone propose ' + all.length + ' voix, mais aucune en français.<br>Sur Android : <b>Paramètres → Système (ou Gestion globale) → Langue et saisie → Synthèse vocale → ⚙ (Moteur Google) → Installer les données vocales → Français</b>. Puis recharge cette page dans Chrome.');
+  } else if (!frVoices.length) {
+    showAlert('<b>Aucune voix détectée pour le moment.</b><br>Si ce message reste affiché : ouvre cette page dans <b>Chrome</b> (et non dans une fenêtre intégrée à une autre application), puis vérifie Paramètres → Système → Langue et saisie → Synthèse vocale → Moteur Google → Français.');
+  } else if (el.alert.dataset.kind !== 'runtime') {
+    showAlert('');
+  }
+  renderDiag();
+}
+
+/* ---------- Découpage du texte (Android coupe les textes trop longs) ---------- */
+function splitText(text){
+  const sentences = text.replace(/\s+/g,' ').trim().match(/[^.!?…;:]+[.!?…;:]*/g) || [];
+  const out = [];
+  for (let s of sentences){
+    s = s.trim(); if (!s) continue;
+    while (s.length > 150){
+      let cut = s.lastIndexOf(',', 150); if (cut < 40) cut = s.lastIndexOf(' ', 150); if (cut < 40) cut = 150;
+      out.push(s.slice(0, cut + 1).trim()); s = s.slice(cut + 1).trim();
+    }
+    if (s) out.push(s);
+  }
+  return out;
+}
+
+/* ---------- Lecture ---------- */
+function speakChunk(mySession){
+  if (mySession !== session || state !== 'playing') return;
+  if (idx >= chunks.length){ lastEvent = 'terminé'; setStatus('Lecture terminée.'); setState('idle'); renderDiag(); return; }
+  const u = new SpeechSynthesisUtterance(chunks[idx]);
+  keepRef = u;
+  u.lang = 'fr-FR';
+  u.rate = +el.rate.value;
+  u.pitch = +el.pitch.value;
+  u.volume = 1;
+  const vi = +el.voice.value;
+  if (vi >= 0 && frVoices[vi]) { u.voice = frVoices[vi]; u.lang = frVoices[vi].lang.replace('_','-'); }
+  u.onstart = () => { started = true; lastEvent = 'phrase ' + (idx+1) + '/' + chunks.length + ' en cours'; setStatus('Lecture… (' + (idx+1) + '/' + chunks.length + ')'); renderDiag(); };
+  u.onend = () => { if (mySession !== session || state !== 'playing') return; idx++; speakChunk(mySession); };
+  u.onerror = e => {
+    if (mySession !== session) return;
+    if (e.error === 'interrupted' || e.error === 'canceled') return;
+    lastError = e.error || 'inconnue'; lastEvent = 'erreur';
+    session++; try{ synth.cancel(); }catch(_){}
+    setState('idle');
+    let why = 'Erreur audio : ' + lastError + '.';
+    if (lastError === 'not-allowed') why = 'Le navigateur bloque le son ici. Ouvre la page dans <b>Chrome</b> et appuie directement sur Écouter.';
+    if (lastError === 'language-unavailable' || lastError === 'voice-unavailable') why = 'Voix française indisponible. Installe les données vocales françaises (voir ci-dessus).';
+    el.alert.dataset.kind = 'runtime'; showAlert('<b>La lecture a échoué.</b><br>' + why);
+    setStatus('Erreur de lecture.'); renderDiag();
+  };
+  synth.speak(u);
+}
+
+function beginAt(startIdx){
+  session++; const my = session;
+  started = false;
+  try { synth.cancel(); } catch(_){}
+  setState('playing'); idx = startIdx;
+  // petit délai après cancel() : Chrome Android ignore parfois un speak() immédiat
+  setTimeout(() => speakChunk(my), 150);
+  // surveillance : si rien ne démarre en 4 s, on explique pourquoi
+  setTimeout(() => {
+    if (my !== session || state !== 'playing' || started) return;
+    if (synth && (synth.speaking || synth.pending)) return;
+    lastEvent = 'aucun son démarré';
+    el.alert.dataset.kind = 'runtime';
+    showAlert('<b>Aucun son n\'a démarré.</b><br>Causes possibles : (1) page ouverte dans une fenêtre intégrée → ouvre-la dans <b>Chrome</b> ; (2) volume média à zéro ou téléphone en silencieux ; (3) aucune voix française installée.');
+    setStatus('Aucun son détecté.'); renderDiag();
+  }, 4000);
+}
+
+function play(textOverride){
+  if (!synth){
+    showAlert('<b>Synthèse vocale indisponible</b> dans ce navigateur. Utilise <b>Chrome</b> sur Android.');
+    setStatus('Synthèse vocale absente.'); return;
+  }
+  const t = (typeof textOverride === 'string' ? textOverride : el.text.value).trim();
+  if (!t){ setStatus('Colle d\'abord un texte.'); return; }
+  el.alert.dataset.kind = '';
+  if (!frVoices.length) loadVoices();
+  chunks = splitText(t);
+  if (!chunks.length){ setStatus('Texte non lisible.'); return; }
+  setStatus('Démarrage…');
+  beginAt(0);
+}
+
+function pauseSpeech(){
+  if (state !== 'playing') return;
+  // pause() natif est peu fiable sur Android : on arrête et on reprendra à la phrase en cours
+  session++; try { synth.cancel(); } catch(_){}
+  setState('paused'); lastEvent = 'pause'; setStatus('En pause (phrase ' + (idx+1) + '/' + chunks.length + ').'); renderDiag();
+}
+function resumeSpeech(){
+  if (state !== 'paused') return;
+  lastEvent = 'reprise'; setStatus('Reprise…'); beginAt(idx);
+}
+function stopSpeech(){
+  session++; try { synth && synth.cancel(); } catch(_){}
+  idx = 0; setState('idle'); lastEvent = 'stop'; setStatus('Arrêté.'); renderDiag();
+}
+
+/* ---------- Événements ---------- */
+el.play.onclick   = () => play();
+el.pause.onclick  = pauseSpeech;
+el.resume.onclick = resumeSpeech;
+el.stop.onclick   = stopSpeech;
+el.test.onclick   = () => { if (state !== 'idle') stopSpeech(); play('Bonjour. Ici Shadow Voice. Ceci est un test de la voix française.'); };
+el.rate.oninput   = () => $('rv').textContent = (+el.rate.value).toFixed(2) + '×';
+el.pitch.oninput  = () => $('pv').textContent = (+el.pitch.value).toFixed(2);
+el.text.oninput   = () => { const n = el.text.value.length; $('count').textContent = n + ' caractère' + (n > 1 ? 's' : ''); };
+$('clear').onclick = () => { el.text.value = ''; el.text.oninput(); };
+$('paste').onclick = async () => {
+  try { el.text.value = await navigator.clipboard.readText(); el.text.oninput(); }
+  catch(e){ setStatus('Colle par un appui long dans la zone de texte.'); }
+};
+window.addEventListener('pagehide', () => { try { synth && synth.cancel(); } catch(_){} });
+
+
+/* ---------- Enregistreur microphone ---------- */
+let mediaRecorder = null;
+let recStream = null;
+let recChunks = [];
+let recBlob = null;
+let recUrl = null;
+
+const recStart = $('recStart');
+const recStop = $('recStop');
+const recStatus = $('recStatus');
+const recPlayback = $('recPlayback');
+const recDownload = $('recDownload');
+
+function recorderMime(){
+  const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
+  return types.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+}
+
+recStart.onclick = async () => {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+    recStatus.textContent = 'Enregistrement non pris en charge ici. Ouvrez la page dans Chrome.';
+    return;
+  }
+  try {
+    recStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    recChunks = [];
+    const mime = recorderMime();
+    mediaRecorder = new MediaRecorder(recStream, mime ? {mimeType:mime} : undefined);
+    mediaRecorder.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      recBlob = new Blob(recChunks, {type: mediaRecorder.mimeType || 'audio/webm'});
+      if (recUrl) URL.revokeObjectURL(recUrl);
+      recUrl = URL.createObjectURL(recBlob);
+      recPlayback.src = recUrl;
+      recPlayback.style.display = 'block';
+      recDownload.disabled = false;
+      recStatus.textContent = 'Enregistrement prêt · ' + (recBlob.size/1024).toFixed(0) + ' Ko';
+      if (recStream) recStream.getTracks().forEach(t => t.stop());
+      recStream = null;
+    };
+    mediaRecorder.start();
+    recStart.disabled = true;
+    recStop.disabled = false;
+    recDownload.disabled = true;
+    recPlayback.style.display = 'none';
+    recStatus.textContent = '● Enregistrement en cours…';
+  } catch (err) {
+    recStatus.textContent = err && err.name === 'NotAllowedError'
+      ? 'Accès au microphone refusé. Autorisez-le dans Chrome.'
+      : 'Impossible de démarrer le microphone.';
+  }
+};
+
+recStop.onclick = () => {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  recStart.disabled = false;
+  recStop.disabled = true;
+};
+
+recDownload.onclick = () => {
+  if (!recBlob || !recUrl) return;
+  const ext = (recBlob.type || '').includes('mp4') ? 'm4a' : 'webm';
+  const a = document.createElement('a');
+  a.href = recUrl;
+  a.download = 'SHADOW-VOICE-recording.' + ext;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
+
+/* ---------- Démarrage ---------- */
+setState('idle');
+if (!synth){
+  showAlert('<b>Synthèse vocale absente.</b> Ouvre cette page dans <b>Chrome</b> sur Android.');
+  renderDiag();
+} else {
+  loadVoices();
+  if ('onvoiceschanged' in synth) synth.onvoiceschanged = loadVoices;
+  // Android charge les voix en différé : on réessaie quelques fois
+  let tries = 0; const iv = setInterval(() => { loadVoices(); if (frVoices.length || ++tries > 10) clearInterval(iv); }, 500);
+}
+</script>
+</body>
+</html>
